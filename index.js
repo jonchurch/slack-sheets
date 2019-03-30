@@ -1,6 +1,8 @@
+require('dotenv').config()
 const express = require('express')
 const bodyParser = require('body-parser')
 const { EventEmitter } = require('events')
+
 
 const mockRecipesIds = ['slack/messagePosted']
 const mockRecipesById = {
@@ -21,51 +23,14 @@ const mockRecipesById = {
 const app = express()
 const controller = new EventEmitter()
 
+
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
 
+// load slack service
+require('./services/slack')(app, controller)
+
 // this is a slack specific endpoint for ingesting slack events
-app.route("/services/slack")
-	.post((req, res) => {
-		const {challenge} = req.body
-	if (challenge) {
-		res.send(challenge)
-		} else {
-			// console.log(req.body)
-			res.sendStatus(200)
-		handleSlackEvent(req.body)
-			}
-		})
-// slack service specific webhook event handler
-function handleSlackEvent(payload) {
-	console.log({payload})
-	const {event, team_id } = payload
-
-	// Format the webhook event into standard trigger event
-	const triggerEvent = {
-		// eventType: "trigger",
-		service: "slack",
-		triggerType: "messagePosted",
-		payload: {
-			team: team_id,
-			user: event.user,
-			// type: "message",
-			text: event.text,
-			channel: event.channel
-			}
-		}
-
-	// publishTriggerEvent(triggerEvent)
-	const  triggerChannel = `${triggerEvent.service}/${triggerEvent.triggerType}`//?team=${triggerEvent.payload.team}`
-
-	// find recipes that are put into motion by the trigger event
-	const recipes = getMatchingRecipes(triggerChannel, triggerEvent)
-	console.log({recipes})
-
-	// once we have the recipes, hand them off to whatever worker/queue/etc handles firing the action
-	//
-	controller.emit(triggerChannel, triggerEvent)
-}
 // mocked up finding recipes whose conditions are satisfied by the trigger event
 function getMatchingRecipes(triggerChannel, triggerEvent) {
 	console.log({triggerChannel})
@@ -75,6 +40,7 @@ function getMatchingRecipes(triggerChannel, triggerEvent) {
 			return []
 			}
 }
+controller.emit('slack/action/postMessage', mockRecipesById[mockRecipesIds[0]])
 controller.on('slack/messagePosted', event => {
 	// update spreadsheet?
 	// well, I need a way to lookup recipe triggers really, the goal isn't to do all this in code
