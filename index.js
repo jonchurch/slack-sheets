@@ -2,19 +2,25 @@ require('dotenv').config()
 const express = require('express')
 const bodyParser = require('body-parser')
 const { EventEmitter } = require('events')
+const mustache = require('mustache').render
 
 
 const mockRecipesIds = ['slack/messagePosted']
 const mockRecipesById = {
 	'slack/messagePosted': {
 		trigger: {
-
+			service: "slack",
+			triggerType: "messagePosted",
+			entities: {
+				channel: "#general",
+				text: "hello"
+				}
 			},
 		action: {
-			service: "googleSheets",
-			actionType: "addRow",
+			service: "console",
+			actionType: "log",
 			payload: {
-				formattedRow: "{{payload.user}}||{{payload.channel}}||{{payload.text}}"
+				text: "Slack user:{{payload.user}} said '{{payload.text}}'"
 				}
 			}
 		}
@@ -41,6 +47,24 @@ function getMatchingRecipes(triggerChannel, triggerEvent) {
 			}
 }
 controller.emit('slack/action/postMessage', mockRecipesById[mockRecipesIds[0]])
+controller.on('trigger.', ({triggerChannel, triggerEvent})=> {
+	// Respond to triggers
+	// Lookup recipes the trigger fulfills
+	const recipes = getMatchingRecipes(triggerChannel, triggerEvent)
+	recipes.map(recipe => {
+		const triggerPayload = triggerEvent.payload
+		const actionPayload = recipe.action.payload
+		Object.keys(actionPayload).forEach(key => {
+			const entity = actionPayload[key]
+			console.log({entity, triggerPayload})
+			// check if entity needs interpolating?
+			const rendered = mustache(entity, {payload: triggerPayload})
+			console.log({rendered})
+			})
+		})
+	// then trigger the action
+	console.log({recipes})
+})
 controller.on('slack/messagePosted', event => {
 	// update spreadsheet?
 	// well, I need a way to lookup recipe triggers really, the goal isn't to do all this in code
