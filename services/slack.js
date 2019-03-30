@@ -16,7 +16,7 @@ app.route("/services/slack")
 		})
 // slack service specific webhook event handler
 function handleSlackEvent(payload) {
-	console.log({payload})
+	// console.log({payload})
 	const {event, team_id } = payload
 	if (event.bot_id) {
 		return
@@ -45,13 +45,14 @@ function handleSlackEvent(payload) {
 }
 
 const actions = {
-	postMessage: recipe => {
+	postMessage: action => {
+		console.log({action})
 		// use slack API to send the message w/ the data provided by the recipe?
-		const {text} = recipe.action.payload
+		const {text} = action.payload
 		slack.chat.postMessage({token: process.env.SLACK_TOKEN, channel: "#general", text})
 		}
 }
 
-controller.on('slack/action/postMessage', recipe => actions.postMessage(recipe))
+controller.on('slack/action/postMessage', action => actions.postMessage(action))
 
 }

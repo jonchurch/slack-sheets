@@ -20,7 +20,7 @@ const mockRecipesById = {
 			service: "console",
 			actionType: "log",
 			payload: {
-				text: "Slack user:{{payload.user}} said '{{payload.text}}'"
+				message: "Slack user:{{payload.user}} said '{{payload.text}}'"
 				}
 			}
 		}
@@ -35,6 +35,7 @@ app.use(bodyParser.urlencoded({extended: true}))
 
 // load slack service
 require('./services/slack')(app, controller)
+require('./services/console')(app, controller)
 
 // this is a slack specific endpoint for ingesting slack events
 // mocked up finding recipes whose conditions are satisfied by the trigger event
@@ -46,25 +47,32 @@ function getMatchingRecipes(triggerChannel, triggerEvent) {
 			return []
 			}
 }
-controller.emit('slack/action/postMessage', mockRecipesById[mockRecipesIds[0]])
+
+function interpolatePayload(actionPayload, triggerPayload) {
+	return Object.keys(actionPayload)
+		.reduce((a, key) => {
+			const entity = actionPayload[key]
+			// console.log({entity, triggerPayload})
+			const rendered = mustache(entity, {payload: triggerPayload})
+			console.log({rendered})
+			a[key] = rendered
+			return a
+			}, {})
+}
 controller.on('trigger.', ({triggerChannel, triggerEvent})=> {
 	// Respond to triggers
 	// Lookup recipes the trigger fulfills
 	const recipes = getMatchingRecipes(triggerChannel, triggerEvent)
-	recipes.map(recipe => {
-		const triggerPayload = triggerEvent.payload
-		const actionPayload = recipe.action.payload
-		Object.keys(actionPayload).forEach(key => {
-			const entity = actionPayload[key]
-			console.log({entity, triggerPayload})
-			// check if entity needs interpolating?
-			const rendered = mustache(entity, {payload: triggerPayload})
-			console.log({rendered})
-			})
-		})
-	// then trigger the action
 	console.log({recipes})
-})
+	recipes.forEach(recipe => {
+		const actionPayload = recipe.action.payload
+		const triggerPayload = triggerEvent.payload
+		const interpolatedPayload = interpolatePayload(actionPayload, triggerPayload)
+		recipe.action.payload = interpolatedPayload
+		// then trigger the action
+		controller.emit(`${recipe.action.service}/${recipe.action.actionType}`, recipe.action)
+		})
+	})
 controller.on('slack/messagePosted', event => {
 	// update spreadsheet?
 	// well, I need a way to lookup recipe triggers really, the goal isn't to do all this in code
@@ -78,6 +86,7 @@ controller.on("googleSheets@actions/addRowToSheet", recipe => {
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => console.log(`Server is listening on port ${PORT}`))
 
+// controller.emit('slack/action/postMessage', mockRecipesById[mockRecipesIds[0]].action)
 
 /* 
  * Services
