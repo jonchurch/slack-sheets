@@ -24,6 +24,7 @@ const controller = new EventEmitter()
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
 
+// this is a slack specific endpoint for ingesting slack events
 app.route("/services/slack")
 	.post((req, res) => {
 		const {challenge} = req.body
@@ -35,11 +36,12 @@ app.route("/services/slack")
 		handleSlackEvent(req.body)
 			}
 		})
-
+// slack service specific webhook event handler
 function handleSlackEvent(payload) {
 	console.log({payload})
 	const {event, team_id } = payload
-	// need to format the payload into a standard event
+
+	// Format the webhook event into standard trigger event
 	const triggerEvent = {
 		// eventType: "trigger",
 		service: "slack",
@@ -56,11 +58,15 @@ function handleSlackEvent(payload) {
 	// publishTriggerEvent(triggerEvent)
 	const  triggerChannel = `${triggerEvent.service}/${triggerEvent.triggerType}`//?team=${triggerEvent.payload.team}`
 
+	// find recipes that are put into motion by the trigger event
 	const recipes = getMatchingRecipes(triggerChannel, triggerEvent)
 	console.log({recipes})
+
 	// once we have the recipes, hand them off to whatever worker/queue/etc handles firing the action
+	//
 	controller.emit(triggerChannel, triggerEvent)
 }
+// mocked up finding recipes whose conditions are satisfied by the trigger event
 function getMatchingRecipes(triggerChannel, triggerEvent) {
 	console.log({triggerChannel})
 	if (mockRecipesIds.includes(triggerChannel)) {
@@ -69,11 +75,25 @@ function getMatchingRecipes(triggerChannel, triggerEvent) {
 			return []
 			}
 }
-controller.on('slack/messagePosted', payload => {
+controller.on('slack/messagePosted', event => {
 	// update spreadsheet?
 	// well, I need a way to lookup recipe triggers really, the goal isn't to do all this in code
+	console.log("heard that slack message", event.payload.text)
+})
+controller.on("googleSheets@actions/addRowToSheet", recipe => {
+	// sheetsService.addRowToSheet({payload: action.payload, userDetails: recipe.user)
+	// then the action has occurred?
 })
 
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => console.log(`Server is listening on port ${PORT}`))
 
+
+/* 
+ * Services
+ * Webhooks
+ * Recipes
+ * Triggers
+ * Actions
+ * Events
+ * */
