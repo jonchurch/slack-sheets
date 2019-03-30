@@ -5,17 +5,12 @@ const { EventEmitter } = require('events')
 const mustache = require('mustache').render
 
 
-const mockRecipesIds = ['slack/messagePosted']
+const mockRecipesIds = ['slack/messagePosted', 'console/readLine']
 const mockRecipesById = {
 	'slack/messagePosted': {
 		trigger: {
 			service: "slack",
 			triggerType: "messagePosted",
-			entities: {
-				channel: "#general",
-				text: "hello"
-				}
-			},
 		action: {
 			service: "console",
 			actionType: "log",
@@ -24,7 +19,22 @@ const mockRecipesById = {
 				}
 			}
 		}
-}
+	},
+	'console/readLine': {
+		trigger: {
+			service: "console",
+			triggerType: "readLine",
+			},
+		action: {
+			service: "slack",
+			actionType: "postMessage",
+			payload: {
+				text: "CONSOLE: {{payload.input}}",
+				channel: "#general"
+				}
+			}
+		}
+	}
 
 const app = express()
 const controller = new EventEmitter()
@@ -60,6 +70,7 @@ function interpolatePayload(actionPayload, triggerPayload) {
 			}, {})
 }
 controller.on('trigger.', ({triggerChannel, triggerEvent})=> {
+	console.log('heard trigger', triggerEvent)
 	// Respond to triggers
 	// Lookup recipes the trigger fulfills
 	const recipes = getMatchingRecipes(triggerChannel, triggerEvent)

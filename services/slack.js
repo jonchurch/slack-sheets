@@ -53,6 +53,6 @@ const actions = {
 		}
 }
 
-controller.on('slack/action/postMessage', action => actions.postMessage(action))
+controller.on('slack/postMessage', action => actions.postMessage(action))
 
 }
