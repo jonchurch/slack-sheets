@@ -5,6 +5,12 @@ const { EventEmitter } = require('events')
 
 const app = express()
 const controller = new EventEmitter()
+// needed to bind 'this' in order to pass the emitter methods down and have them keep working
+// Either way below is valid
+const publish = (...rest) => controller.emit(...rest)
+const subscribe = controller.on.bind(controller)
+// or I could just pass in the controller, so we don't lose the reference to this?
+// const subscribe = (...rest) => controller.on(...rest)
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -13,7 +19,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 require('./events')(controller)
 
 // load slack service
-require('./services/slack')(app, controller)
+require('./services/slack')({server: app, subscribe, publish})
 require('./services/console')(app, controller)
 
 const PORT = process.env.PORT || 3000
