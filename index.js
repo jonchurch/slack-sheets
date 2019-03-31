@@ -16,12 +16,9 @@ require('./events')(controller)
 require('./services/slack')(app, controller)
 require('./services/console')(app, controller)
 
-// this is a slack specific endpoint for ingesting slack events
-
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => console.log(`Server is listening on port ${PORT}`))
 
-// controller.emit('slack/action/postMessage', mockRecipesById[mockRecipesIds[0]].action)
 
 /*
  * Services
