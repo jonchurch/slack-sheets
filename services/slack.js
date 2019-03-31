@@ -40,13 +40,13 @@ function handleSlackEvent(payload) {
 	// find recipes that are put into motion by the trigger event
 	// const recipes = getMatchingRecipes(triggerChannel, triggerEvent)
 	const  triggerChannel = `${triggerEvent.service}/${triggerEvent.triggerType}`//?team=${triggerEvent.payload.team}`
-
+	console.log({triggerEvent})
 	controller.emit('trigger.', {triggerChannel, triggerEvent})
 }
 
 const actions = {
 	postMessage: action => {
-		console.log({action})
+		// console.log({action})
 		// use slack API to send the message w/ the data provided by the recipe?
 		const {text} = action.payload
 		slack.chat.postMessage({token: process.env.SLACK_TOKEN, channel: "#general", text})
