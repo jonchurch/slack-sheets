@@ -3,14 +3,11 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const { EventEmitter } = require('events')
 
-
-
 const app = express()
 const controller = new EventEmitter()
 
-
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended: true}))
+app.use(bodyParser.urlencoded({ extended: true }))
 
 // load events service
 require('./events')(controller)
@@ -26,7 +23,7 @@ app.listen(PORT, () => console.log(`Server is listening on port ${PORT}`))
 
 // controller.emit('slack/action/postMessage', mockRecipesById[mockRecipesIds[0]].action)
 
-/* 
+/*
  * Services
  * Triggers
  * Actions
