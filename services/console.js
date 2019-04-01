@@ -1,7 +1,8 @@
 const readline = require('readline')
 
+const serviceName = 'console'
+module.exports = ({ subscribe, publish }) => {
 
-module.exports = (app, controller) => {
 	function startReadLineInput() {
 		const rl = readline.createInterface({
 		input: process.stdin,
@@ -15,7 +16,7 @@ module.exports = (app, controller) => {
 					input,
 					},
 				}
-			controller.emit('trigger.', {
+			publish('trigger.', {
 				triggerChannel: 'console/readLine',
 				triggerEvent,
 			})
@@ -24,5 +25,5 @@ module.exports = (app, controller) => {
 	// startReadLineInput()
 
   const log = message => console.log(`:: ${message}`)
-  controller.on('console/log', ({ payload: { message } }) => log(message))
+  subscribe('console/log', ({ payload: { message } }) => log(message))
 }

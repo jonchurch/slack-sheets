@@ -17,9 +17,9 @@ const slack = require('slack')
 
 const serviceName = 'slack'
 
-module.exports = function({server, subscribe, publish}) {
+module.exports = function({router, subscribe, publish}) {
 	// setup webhook route w/ express server
-	server.route(`/services/${serviceName}`).post((req, res) => {
+	router.route(`/${serviceName}`).post((req, res) => {
 		// slack requires a handshake challenge to verify webhooks during setup
     const { challenge } = req.body
     if (challenge) {
@@ -29,7 +29,9 @@ module.exports = function({server, subscribe, publish}) {
       res.sendStatus(200)
       handleSlackEvent(req.body)
     }
-  })
+		})
+	
+	router.route(`/${serviceName}/test`).get((req, res) => res.send('ok'))
 
 	// slack service specific webhook event handler
 	// formats and publishes triggerEvents
