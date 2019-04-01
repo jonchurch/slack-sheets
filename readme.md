@@ -34,6 +34,7 @@ I found several projects as inspiration, OSS projects that let users create reci
 * [Node Red](https://nodered.org/) - JS foundation + IBM project, IOT and IFTTT style workflows. Has lots of integrations (called "nodes"). 
 * [Huginn](https://github.com/huginn/huginn) - Ruby application, one of the most popular projects in this niche. Frontend is much more developer focused, inputting JSON payloads and all.
 * [Datafire](https://github.com/DataFire/DataFire) - Node applicaton, limited triggers (mostly cron, no triggers created by 3rd party APIs webhooks)
+* [Serverless Event Gateway](https://github.com/serverless/event-gateway) - More of a framework than a project, connects a serverless mesh of services, which can publish and subscribe to Events. Everything is a handler for an event, and events are propogated through the whole system. Functions are registed as services, and can subscribe to any event in the system.
 
 ## Current Setup
 
