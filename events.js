@@ -56,9 +56,9 @@ function interpolatePayload(actionPayload, triggerPayload) {
     return a
   }, {})
 }
-module.exports = controller => {
+module.exports = ({subscribe, publish})=> {
   // controller.emit('slack/action/postMessage', mockRecipesById[mockRecipesIds[0]].action)
-  controller.on('trigger.', ({ triggerChannel, triggerEvent }) => {
+  subscribe('trigger.', ({ triggerChannel, triggerEvent }) => {
     console.log('heard trigger', triggerChannel)
     // Respond to triggers
     // Lookup recipes the trigger fulfills
@@ -84,4 +84,17 @@ module.exports = controller => {
       // )
     })
   })
+	publish('googleSheets/addRowToSheet', {payload: {
+		rows: [
+              [
+				  'Steve Spaghetti',
+                '555-555-555',
+                'large',
+				  'ham, shroom, feta',
+				  'pizza@pasta.com',
+                new Date().toString(),
+              ],
+		],
+		spreadsheetId: '1AOGTwNGSXkYJiVJVCQvzY3NLq4HOlWQlu4t0rLhFPjY'
+		}})
 }

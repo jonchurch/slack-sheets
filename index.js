@@ -16,13 +16,14 @@ const subscribe = controller.on.bind(controller)
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
-// load events service
-require('./events')(controller)
 
 // load services
 require('./services/console')({ router, subscribe, publish })
 require('./services/slack')({ router, subscribe, publish })
 require('./services/googleSheets')({ router, subscribe, publish })
+
+// load events service
+require('./events')({publish, subscribe})
 
 app.use('/services', router)
 
