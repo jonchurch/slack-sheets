@@ -19,9 +19,10 @@ app.use(bodyParser.urlencoded({ extended: true }))
 // load events service
 require('./events')(controller)
 
-// load slack service
-require('./services/slack')({router, subscribe, publish})
+// load services
 require('./services/console')({router, subscribe, publish})
+require('./services/slack')({router, subscribe, publish})
+require('./services/googleSheets')({router, subscribe, publish})
 
 app.use('/services', router)
 

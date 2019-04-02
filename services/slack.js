@@ -16,6 +16,7 @@ const slack = require('slack')
  */
 
 const serviceName = 'slack'
+const SLACK_TOKEN = process.env.SLACK_TOKEN
 
 module.exports = function({router, subscribe, publish}) {
 	// setup webhook route w/ express server
@@ -74,7 +75,7 @@ module.exports = function({router, subscribe, publish}) {
       // use slack API to send the message w/ the data provided by the recipe?
       const { text } = action.payload
       slack.chat.postMessage({
-        token: process.env.SLACK_TOKEN,
+        token: SLACK_TOKEN,
         channel: '#general',
         text,
       })
