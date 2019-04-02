@@ -3,15 +3,19 @@ const { google } = require('googleapis')
 
 const serviceName = 'googleSheets'
 
-const { 
-	installed: {client_id, client_secret, redirect_uris}
+const {
+  installed: { client_id, client_secret, redirect_uris },
 } = JSON.parse(fs.readFileSync('./credentials.json'))
 const token = JSON.parse(fs.readFileSync('./token.json'))
 
-const OAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0])
+const OAuth2Client = new google.auth.OAuth2(
+  client_id,
+  client_secret,
+  redirect_uris[0]
+)
 OAuth2Client.setCredentials(token)
 
-const sheets = google.sheets({ version: 'v4', auth: OAuth2Client})
+const sheets = google.sheets({ version: 'v4', auth: OAuth2Client })
 
 // const configClient = async () => {
 //   const {
@@ -56,5 +60,4 @@ module.exports = ({ router, subscribe, publish }) => {
   Object.keys(actions).forEach(method =>
     subscribe(`${serviceName}/${method}`, event => actions[method](event))
   )
-
 }

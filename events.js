@@ -56,7 +56,7 @@ function interpolatePayload(actionPayload, triggerPayload) {
     return a
   }, {})
 }
-module.exports = ({subscribe, publish})=> {
+module.exports = ({ subscribe, publish }) => {
   // controller.emit('slack/action/postMessage', mockRecipesById[mockRecipesIds[0]].action)
   subscribe('trigger.', ({ triggerChannel, triggerEvent }) => {
     console.log('heard trigger', triggerChannel)
@@ -84,17 +84,19 @@ module.exports = ({subscribe, publish})=> {
       // )
     })
   })
-	publish('googleSheets/addRowToSheet', {payload: {
-		rows: [
-              [
-				  'Steve Spaghetti',
-                '555-555-555',
-                'large',
-				  'ham, shroom, feta',
-				  'pizza@pasta.com',
-                new Date().toString(),
-              ],
-		],
-		spreadsheetId: '1AOGTwNGSXkYJiVJVCQvzY3NLq4HOlWQlu4t0rLhFPjY'
-		}})
+  publish('googleSheets/addRowToSheet', {
+    payload: {
+      rows: [
+        [
+          'Steve Spaghetti',
+          '555-555-555',
+          'large',
+          'ham, shroom, feta',
+          'pizza@pasta.com',
+          new Date().toString(),
+        ],
+      ],
+      spreadsheetId: '1AOGTwNGSXkYJiVJVCQvzY3NLq4HOlWQlu4t0rLhFPjY',
+    },
+  })
 }
