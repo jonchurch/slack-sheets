@@ -20,15 +20,14 @@ app.use(bodyParser.urlencoded({ extended: true }))
 require('./events')(controller)
 
 // load services
-require('./services/console')({router, subscribe, publish})
-require('./services/slack')({router, subscribe, publish})
-require('./services/googleSheets')({router, subscribe, publish})
+require('./services/console')({ router, subscribe, publish })
+require('./services/slack')({ router, subscribe, publish })
+require('./services/googleSheets')({ router, subscribe, publish })
 
 app.use('/services', router)
 
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => console.log(`Server is listening on port ${PORT}`))
-
 
 /*
  * Services

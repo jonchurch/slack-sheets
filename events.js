@@ -57,7 +57,7 @@ function interpolatePayload(actionPayload, triggerPayload) {
   }, {})
 }
 module.exports = controller => {
-// controller.emit('slack/action/postMessage', mockRecipesById[mockRecipesIds[0]].action)
+  // controller.emit('slack/action/postMessage', mockRecipesById[mockRecipesIds[0]].action)
   controller.on('trigger.', ({ triggerChannel, triggerEvent }) => {
     console.log('heard trigger', triggerChannel)
     // Respond to triggers
@@ -69,12 +69,15 @@ module.exports = controller => {
       const interpolatedPayload = interpolatePayload(
         actionPayload,
         triggerPayload
-	  )
-		// this is just not good practice, is all
-		// I don't need deep clone, I just need to not mutate objects like this
+      )
+      // this is just not good practice, is all
+      // I don't need deep clone, I just need to not mutate objects like this
       recipe.action.payload = interpolatedPayload
       // then trigger the action
-      controller.emit(`${recipe.action.service}/${recipe.action.actionType}`, {...recipe.action, payload: interpolatedPayload})
+      controller.emit(`${recipe.action.service}/${recipe.action.actionType}`, {
+        ...recipe.action,
+        payload: interpolatedPayload,
+      })
       // controller.emit(
       //   `${recipe.action.service}/${recipe.action.actionType}`,
       //   recipe.action
